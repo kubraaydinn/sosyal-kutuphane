@@ -150,14 +150,6 @@
 
 /* Aktivite kartları */
 
-.user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-size: cover;
-  background-position: center;
-}
-
 .activity-poster {
   width: 80px;
   height: 120px;
@@ -188,7 +180,6 @@
 }
 
 /* Arama sayfası kaydırma */
-
 
 .discovery-row {
   margin-bottom: 2rem;
@@ -231,4 +222,109 @@
   font-size: 0.8rem;
   color: #666;
   margin-top: 0.25rem;
+}
+
+/* ========================= */
+/*      MOBİL İYİLEŞTİRME    */
+/* ========================= */
+
+/* 992px altı: tablet ve küçük laptoplar */
+@media (max-width: 992px) {
+
+  .profile-header-inner {
+    padding: 1.25rem 1.25rem;
+    margin-top: -50px;
+  }
+
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .profile-activity-column {
+    border-right: none;
+    border-bottom: 1px solid #2c2c2c;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .profile-main-column {
+    margin-top: 0.5rem;
+  }
+
+  .shelf-item {
+    width: 100px;
+  }
+
+  .shelf-item img,
+  .shelf-item-placeholder {
+    width: 100px;
+    height: 150px;
+  }
+
+  .shelf-nav {
+    height: 64px;
+  }
+}
+
+/* 576px altı: telefonlar */
+@media (max-width: 576px) {
+
+  .profile-header-inner {
+    flex-direction: row;
+    align-items: center;
+    margin-top: -45px;
+  }
+
+  .profile-avatar {
+    width: 70px;
+    height: 70px;
+  }
+
+  .profile-header-inner h3 {
+    font-size: 1.25rem;
+  }
+
+  .profile-stat .stat-number {
+    font-size: 1rem;
+  }
+
+  .profile-stat .stat-label {
+    font-size: 0.75rem;
+  }
+
+  /* Aktivite kartları biraz daha kompakt olsun */
+  .activity-card.compact .activity-poster {
+    width: 50px;
+    height: 75px;
+  }
+
+  .activity-card .user-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Raf item’lerini küçültelim */
+  .shelf-item {
+    width: 90px;
+  }
+
+  .shelf-item img,
+  .shelf-item-placeholder {
+    width: 90px;
+    height: 135px;
+  }
+
+  .shelf-item-title {
+    font-size: 0.75rem;
+  }
+
+  /* Çok küçük ekranda okları gizle, parmakla kaydırma yeterli */
+  .shelf-nav {
+    display: none;
+  }
+
+  .profile-library h4 {
+    font-size: 1.1rem;
+  }
 }

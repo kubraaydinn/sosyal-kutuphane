@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from ..models import db, User, UserList, Activity, Follow, ListItem
-from sqlalchemy.orm import joinedload
 
 bp = Blueprint("profile", __name__, template_folder="../templates/profile")
 
@@ -100,8 +99,6 @@ def view_profile(username):
     if not read_items and len(read_defaults) > 1:
         read_items = _items_for_list(read_defaults[1])
 
-
-
     return render_template(
         "profile/profile.html",
         profile_user=user,
@@ -117,7 +114,7 @@ def view_profile(username):
         watchlist_items=watchlist_items,
         read_items=read_items,
         toread_items=toread_items,
-                )
+    )
 
 
 

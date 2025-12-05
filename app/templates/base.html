@@ -3,12 +3,15 @@
 <head>
     <meta charset="utf-8">
     <title>{% block title %}Sosyal Kütüphane{% endblock %}</title>
+
+    <!-- Mobil uyum için şart -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap -->
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
     {% block head %}{% endblock %}
 </head>
 <body>
@@ -16,6 +19,7 @@
     <div class="container">
         <a class="navbar-brand" href="{{ url_for('feed.index') }}">Sosyal Kütüphane</a>
 
+        <!-- Mobilde hamburger menü -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarMain" aria-controls="navbarMain"
                 aria-expanded="false" aria-label="Toggle navigation">
@@ -37,13 +41,13 @@
                 {% endif %}
             </ul>
 
-
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 {% if current_user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('profile.view_profile', username=current_user.username) }}">
+                        <a class="nav-link"
+                           href="{{ url_for('profile.view_profile', username=current_user.username) }}">
                             {{ current_user.username }}
-                        </span>
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('auth.logout') }}">Çıkış</a>
@@ -62,22 +66,22 @@
 </nav>
 
 <main class="container mb-5">
-    <!-- Flash mesajları -->
+    {# Flash mesajları #}
     {% with messages = get_flashed_messages(with_categories=True) %}
       {% if messages %}
         <div class="mt-2">
           {% for category, message in messages %}
             <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
               {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"
+                      aria-label="Close"></button>
             </div>
           {% endfor %}
         </div>
       {% endif %}
     {% endwith %}
 
-    {% block content %}
-    {% endblock %}
+    {% block content %}{% endblock %}
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

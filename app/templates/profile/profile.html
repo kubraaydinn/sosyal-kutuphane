@@ -1,29 +1,25 @@
 {% extends "base.html" %}
 
-{# ----- Raf bileşeni (izlenen / izlenecek / okunan / okunacak) ----- #}
 {% macro shelf(title, items, shelf_id) %}
 <div class="profile-shelf mb-4">
   <div class="d-flex justify-content-between align-items-center mb-2">
     <h5 class="mb-0">{{ title }}</h5>
   </div>
-
   <div class="shelf-wrapper">
     <button class="shelf-nav prev" type="button" data-target="#{{ shelf_id }}">‹</button>
 
     <div class="shelf-scroll" id="{{ shelf_id }}">
-      {% if items and items|length > 0 %}
+      {% if items %}
         {% for item in items %}
           {% set c = item.content %}
-          {% if c %}
-            <a href="{{ url_for('content.detail', content_id=c.id) }}" class="shelf-item">
-              {% if c.poster_url %}
-                <img src="{{ c.poster_url }}" alt="{{ c.title }}">
-              {% else %}
-                <div class="shelf-item-placeholder">Kapak yok</div>
-              {% endif %}
-              <div class="shelf-item-title">{{ c.title }}</div>
-            </a>
-          {% endif %}
+          <a href="{{ url_for('content.detail', content_id=c.id) }}" class="shelf-item">
+            {% if c.poster_url %}
+              <img src="{{ c.poster_url }}" alt="{{ c.title }}">
+            {% else %}
+              <div class="shelf-item-placeholder">Kapak yok</div>
+            {% endif %}
+            <div class="shelf-item-title">{{ c.title }}</div>
+          </a>
         {% endfor %}
       {% else %}
         <div class="shelf-empty text-muted small">
@@ -40,11 +36,11 @@
 {% block content %}
 <div class="container mt-4 profile-page">
   <div class="row">
-    {# ----------------- SOL KOLON: SON AKTİVİTELER ----------------- #}
+    <!-- SOL KOLON: Son Aktiviteler -->
     <div class="col-md-3 profile-activity-column">
       <h5 class="mb-3">Son Aktiviteler</h5>
 
-      {% if activities and activities|length > 0 %}
+      {% if activities %}
         <div class="activity-list">
           {% for act in activities %}
             <div class="activity-card compact mb-3">
@@ -65,8 +61,7 @@
 
               {% if act.content %}
               <div class="activity-body d-flex mt-2">
-                <a href="{{ url_for('content.detail', content_id=act.content.id) }}"
-                   class="poster-wrapper">
+                <a href="{{ url_for('content.detail', content_id=act.content.id) }}" class="poster-wrapper">
                   {% if act.content.poster_url %}
                     <img src="{{ act.content.poster_url }}"
                          alt="{{ act.content.title }}"
@@ -97,7 +92,7 @@
       {% endif %}
     </div>
 
-    {# ----------------- SAĞ KOLON: PROFİL + KÜTÜPHANE ----------------- #}
+    <!-- SAĞ / ANA KOLON -->
     <div class="col-md-9 profile-main-column">
       <!-- Profil üst kartı -->
       <div class="profile-header-card mb-4">
@@ -138,8 +133,7 @@
 
           <div class="ms-auto">
             {% if is_owner %}
-              <a href="{{ url_for('profile.edit_profile',
-                                  username=profile_user.username) }}"
+              <a href="{{ url_for('profile.edit_profile', username=profile_user.username) }}"
                  class="btn btn-outline-light btn-sm">
                 Profili Düzenle
               </a>
@@ -169,30 +163,6 @@
         {{ shelf("İzlenecek Filmler", watchlist_items, "shelf-watchlist") }}
         {{ shelf("Okunan Kitaplar", read_items, "shelf-read") }}
         {{ shelf("Okunacak Kitaplar", toread_items, "shelf-toread") }}
-
-        <!-- Özel listeler -->
-        <h5 class="mt-4 mb-2">Özel Listeler</h5>
-        {% set has_custom = false %}
-        {% for lst in lists %}
-          {% if not lst.is_default %}
-            {% set has_custom = true %}
-            <div class="card mb-2">
-              <div class="card-body py-2">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <strong>{{ lst.name }}</strong>
-                    <div class="text-muted small">
-                      {{ lst.items|length }} içerik
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          {% endif %}
-        {% endfor %}
-        {% if not has_custom %}
-          <p class="text-muted small">Henüz özel liste yok.</p>
-        {% endif %}
       </div>
     </div>
   </div>
