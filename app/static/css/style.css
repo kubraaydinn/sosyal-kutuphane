@@ -232,3 +232,24 @@
   color: #666;
   margin-top: 0.25rem;
 }
+
+.profile-activity-list {
+    max-height: 520px;     /* profil orta kısmına göre ayarlayabilirsin */
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.profile-activity-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.profile-activity-list::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.profile-activity-list {
+    max-height: 520px;   /* profil gövdene göre ayarla */
+    overflow-y: auto;
+    padding-right: 4px;
+}
