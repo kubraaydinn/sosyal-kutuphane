@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% macro shelf(title, items, shelf_id) %}
+<div class="profile-shelf mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="mb-0">{{ title }}</h5>
+  </div>
+  <div class="shelf-wrapper">
+    <button class="shelf-nav prev" type="button" data-target="#{{ shelf_id }}">‹</button>
+
+    <div class="shelf-scroll" id="{{ shelf_id }}">
+      {% if items %}
+        {% for item in items %}
+          {% set c = item.content %}
+          <a href="{{ url_for('content.detail', content_id=c.id) }}" class="shelf-item">
+            {% if c.poster_url %}
+              <img src="{{ c.poster_url }}" alt="{{ c.title }}">
+            {% else %}
+              <div class="shelf-item-placeholder">Kapak yok</div>
+            {% endif %}
+            <div class="shelf-item-title">{{ c.title }}</div>
+          </a>
+        {% endfor %}
+      {% else %}
+        <div class="shelf-empty text-muted small">
+          Bu listede içerik yok.
+        </div>
+      {% endif %}
+    </div>
+
+    <button class="shelf-nav next" type="button" data-target="#{{ shelf_id }}">›</button>
+  </div>
+</div>
+{% endmacro %}
+
+{% block content %}
+<div class="container mt-4 profile-page">
+  <div class="row">
+    <!-- SOL KOLON: Son Aktiviteler -->
+    <div class="col-md-3 profile-activity-column">
+      <h5 class="mb-3">Son Aktiviteler</h5>
+
+      {% if activities %}
+        <div class="activity-list">
+          {% for act in activities %}
+            <div class="activity-card compact mb-3">
+              <div class="activity-header d-flex align-items-center">
+                {% set avatar_src = act.user.avatar_url or 'https://i.pravatar.cc/150?u=' ~ act.user.id %}
+                <div class="user-avatar"
+                     style="background-image: url('{{ avatar_src }}');"></div>
+                <div class="ms-2">
+                  <a href="{{ url_for('profile.view_profile', username=act.user.username) }}"
+                     class="username">
+                    {{ act.user.username }}
+                  </a>
+                  <div class="activity-meta small text-muted">
+                    {{ act.created_at.strftime("%d.%m.%Y %H:%M") }}
+                  </div>
+                </div>
+              </div>
+
+              {% if act.content %}
+              <div class="activity-body d-flex mt-2">
+                <a href="{{ url_for('content.detail', content_id=act.content.id) }}" class="poster-wrapper">
+                  {% if act.content.poster_url %}
+                    <img src="{{ act.content.poster_url }}"
+                         alt="{{ act.content.title }}"
+                         class="activity-poster">
+                  {% else %}
+                    <div class="activity-poster placeholder-poster">Kapak yok</div>
+                  {% endif %}
+                </a>
+                <div class="ms-2">
+                  <div class="fw-semibold">{{ act.content.title }}</div>
+                  <div class="small text-muted">
+                    {% if act.activity_type == "rating" %}
+                      Puan verdi.
+                    {% elif act.activity_type == "review" %}
+                      Yorum yaptı.
+                    {% elif act.activity_type == "list_add" %}
+                      Listeye ekledi.
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted small">Henüz aktivite yok.</p>
+      {% endif %}
+    </div>
+
+    <!-- SAĞ / ANA KOLON -->
+    <div class="col-md-9 profile-main-column">
+      <!-- Profil üst kartı -->
+      <div class="profile-header-card mb-4">
+        <div class="profile-cover"></div>
+
+        <div class="profile-header-inner d-flex align-items-end">
+          <div class="profile-avatar-wrapper">
+            {% set avatar_src = profile_user.avatar_url or 'https://i.pravatar.cc/300?u=' ~ profile_user.id %}
+            <div class="profile-avatar"
+                 style="background-image: url('{{ avatar_src }}');"></div>
+          </div>
+
+          <div class="ms-3 flex-grow-1">
+            <h3 class="mb-1">{{ profile_user.username }}</h3>
+
+            {% if profile_user.bio %}
+              <p class="mb-1 text-muted small">{{ profile_user.bio }}</p>
+            {% endif %}
+
+            <div class="d-flex align-items-center gap-3 mt-1">
+              <a href="{{ url_for('profile.view_follow_list',
+                                  username=profile_user.username,
+                                  list_type='following') }}"
+                 class="profile-stat">
+                <span class="stat-number">{{ following_count }}</span>
+                <span class="stat-label">takip edilen</span>
+              </a>
+
+              <a href="{{ url_for('profile.view_follow_list',
+                                  username=profile_user.username,
+                                  list_type='followers') }}"
+                 class="profile-stat">
+                <span class="stat-number">{{ followers_count }}</span>
+                <span class="stat-label">takipçi</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="ms-auto">
+            {% if is_owner %}
+              <a href="{{ url_for('profile.edit_profile', username=profile_user.username) }}"
+                 class="btn btn-outline-light btn-sm">
+                Profili Düzenle
+              </a>
+            {% else %}
+              <form method="post"
+                    action="{% if is_following %}
+                               {{ url_for('profile.unfollow_user',
+                                          username=profile_user.username) }}
+                             {% else %}
+                               {{ url_for('profile.follow_user',
+                                          username=profile_user.username) }}
+                             {% endif %}">
+                <button class="btn btn-primary btn-sm" type="submit">
+                  {% if is_following %}Takipten Çık{% else %}Takip Et{% endif %}
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Kütüphane rafları -->
+      <div class="profile-library">
+        <h4 class="mb-3">Kütüphane</h4>
+
+        {{ shelf("İzlenen Filmler", watched_items, "shelf-watched") }}
+        {{ shelf("İzlenecek Filmler", watchlist_items, "shelf-watchlist") }}
+        {{ shelf("Okunan Kitaplar", read_items, "shelf-read") }}
+        {{ shelf("Okunacak Kitaplar", toread_items, "shelf-toread") }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

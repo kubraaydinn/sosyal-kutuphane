@@ -1,0 +1,9 @@
+{% for c in comments %}
+  <div class="comment-item mb-1">
+    <strong>{{ c.user.username }}</strong>:
+    {{ c.text }}
+    <span class="text-muted"> · {{ c.created_at|timesince }} önce</span>
+  </div>
+{% else %}
+  <div class="text-muted small">Henüz yorum yok.</div>
+{% endfor %}

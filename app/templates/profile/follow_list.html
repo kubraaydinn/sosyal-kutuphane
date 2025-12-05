@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3 class="mb-3">
+    {% if list_type == 'followers' %}
+      {{ profile_user.username }} – Takipçiler
+    {% else %}
+      {{ profile_user.username }} – Takip Edilenler
+    {% endif %}
+  </h3>
+
+  {% if users %}
+    <div class="list-group">
+      {% for u in users %}
+        {% set avatar_src = u.avatar_url or 'https://i.pravatar.cc/150?u=' ~ u.id %}
+        <a href="{{ url_for('profile.view_profile', username=u.username) }}"
+           class="list-group-item list-group-item-action d-flex align-items-center">
+          <div class="user-avatar small-avatar me-2"
+               style="background-image: url('{{ avatar_src }}');"></div>
+          <div>
+            <div class="fw-semibold">{{ u.username }}</div>
+            {% if u.bio %}
+              <div class="small text-muted">
+                {{ u.bio[:80] }}{% if u.bio|length > 80 %}...{% endif %}
+              </div>
+            {% endif %}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">Bu listede kullanıcı yok.</p>
+  {% endif %}
+</div>
+{% endblock %}

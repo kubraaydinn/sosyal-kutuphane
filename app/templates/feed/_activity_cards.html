@@ -1,0 +1,141 @@
+{% for card in activity_cards %}
+  {% set act = card.activity %}
+  {% set rating = card.rating %}
+  {% set review = card.review %}
+  {% set list_item = card.list_item %}
+  {% set likes_count = card.likes_count %}
+  {% set comments = card.comments %}
+
+  <div class="col">
+    <div class="activity-card card h-100 shadow-sm">
+      <div class="card-body d-flex flex-column">
+
+        <!-- HEADER -->
+        <div class="activity-header d-flex align-items-center mb-2">
+          {% set avatar_src = act.user.avatar_url or 'https://i.pravatar.cc/80?u=' ~ act.user.id %}
+          <div class="user-avatar me-2"
+               style="background-image: url('{{ avatar_src }}');"></div>
+
+          <div class="header-info">
+            <a href="{{ url_for('profile.view_profile', username=act.user.username) }}"
+               class="fw-semibold text-decoration-none">
+              {{ act.user.username }}
+            </a>
+
+            <div class="small text-muted">
+              {% if act.activity_type == "rating" %}
+                bir {{ 'film' if act.content and act.content.type == 'movie' else 'kitap' }} için puan verdi.
+              {% elif act.activity_type == "review" %}
+                bir {{ 'film' if act.content and act.content.type == 'movie' else 'kitap' }} hakkında yorum yaptı.
+              {% elif act.activity_type == "list_add" %}
+                {% if list_item and list_item.user_list %}
+                  "{{ list_item.user_list.name }}" listesine ekledi.
+                {% else %}
+                  bir içeriği listesine ekledi.
+                {% endif %}
+              {% else %}
+                bir aktivite gerçekleştirdi.
+              {% endif %}
+            </div>
+
+            <div class="small text-muted">
+              {{ act.created_at|timesince }} önce
+            </div>
+          </div>
+        </div>
+
+        <!-- BODY -->
+        {% if act.content %}
+          <div class="activity-body d-flex gap-3 mt-2">
+            {% if act.content.poster_url %}
+              <a href="{{ url_for('content.detail', content_id=act.content.id) }}">
+                <img src="{{ act.content.poster_url }}"
+                     alt="{{ act.content.title }}"
+                     class="activity-poster rounded">
+              </a>
+            {% endif %}
+
+            <div class="flex-grow-1">
+              <h6 class="mb-1">
+                <a href="{{ url_for('content.detail', content_id=act.content.id) }}"
+                   class="text-decoration-none">
+                  {{ act.content.title }}
+                </a>
+              </h6>
+
+              {% if rating %}
+                <div class="rating-display mb-1">
+                  <span class="rating-score fw-semibold">{{ rating.score }}/10</span>
+                  <span class="rating-stars ms-1">
+                    {% for i in range(1, 11) %}
+                      <span class="star {% if i <= rating.score %}filled{% endif %}">★</span>
+                    {% endfor %}
+                  </span>
+                </div>
+              {% endif %}
+
+              {% if review %}
+                {% set full = review.text or "" %}
+                {% set excerpt = full[:200] %}
+                <p class="review-excerpt small text-muted mb-1">
+                  {{ excerpt }}{% if full|length > 200 %}...{% endif %}
+                  <a href="{{ url_for('content.detail', content_id=act.content.id) }}">
+                    daha fazlasını oku
+                  </a>
+                </p>
+              {% endif %}
+
+              {% if list_item and list_item.user_list %}
+                <p class="small text-muted mb-1">
+                  "{{ list_item.user_list.name }}" listesine eklendi.
+                </p>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- FOOTER -->
+        <div class="mt-3 pt-2 border-top d-flex justify-content-between align-items-center">
+          <div>
+            <button class="btn btn-sm btn-outline-secondary activity-like-btn"
+                    data-activity-id="{{ act.id }}"
+                    data-like-url="{{ url_for('feed.like_activity', activity_id=act.id) }}">
+              Beğen
+            </button>
+            <small class="text-muted ms-2">
+              <span class="activity-like-count" data-activity-id="{{ act.id }}">{{ likes_count }}</span>
+              beğeni
+            </small>
+          </div>
+
+          <div>
+            <button class="btn btn-sm btn-outline-secondary activity-comment-toggle"
+                    data-activity-id="{{ act.id }}">
+              Yorum Yap
+            </button>
+            <small class="text-muted ms-2">
+              <span class="activity-comment-count" data-activity-id="{{ act.id }}">{{ comments|length }}</span>
+              yorum
+            </small>
+          </div>
+        </div>
+
+        <!-- YORUM BÖLÜMÜ -->
+        <div class="activity-comments mt-2 d-none" id="activity-comments-{{ act.id }}">
+          <div class="comment-list small mb-2">
+            {% include "feed/_activity_comments.html" with context %}
+          </div>
+          <form class="comment-form"
+                data-activity-id="{{ act.id }}"
+                data-comment-url="{{ url_for('feed.comment_activity', activity_id=act.id) }}">
+            <div class="input-group input-group-sm">
+              <input type="text" class="form-control" name="text" placeholder="Yorum yaz...">
+              <button class="btn btn-primary">Gönder</button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+{% endfor %}

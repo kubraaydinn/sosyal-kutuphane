@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+
+# Sanal ortam
+venv/
+.venv/
+
+# VS Code
+.vscode/
+
+# Flask / SQLite
+instance/
+*.db
+
+# Sistem dosyaları
+.DS_Store
+Thumbs.db
