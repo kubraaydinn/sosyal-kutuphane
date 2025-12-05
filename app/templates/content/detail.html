@@ -53,7 +53,6 @@
             </div>
         {% endif %}
 
-
         <hr>
 
         <!-- Puan verme formu -->
@@ -76,8 +75,6 @@
             </div>
         </form>
 
-                   <!--<hr>-->
-
         <!-- Listelere ekle -->
         <h5>Listelere Ekle</h5>
         <form method="post" class="row g-2 mb-4">
@@ -98,7 +95,6 @@
             </div>
         </form>
 
-
         <!-- Yorum formu -->
         <h5>Yorum Yaz</h5>
         <form method="post" class="mb-4">
@@ -116,11 +112,41 @@
         {% if reviews %}
             {% for rev in reviews %}
                 <div class="border rounded p-2 mb-2">
-                    <div class="small text-muted mb-1">
-                        <strong>{{ rev.user.username }}</strong>
-                        · {{ rev.created_at.strftime("%d.%m.%Y %H:%M") }}
+                    <div class="d-flex justify-content-between">
+                        <div class="small text-muted mb-1">
+                            <strong>{{ rev.user.username }}</strong>
+                            · {{ rev.created_at.strftime("%d.%m.%Y %H:%M") }}
+                            {% if rev.updated_at %}
+                                <span class="text-muted">(güncellendi)</span>
+                            {% endif %}
+                        </div>
+
+                        {% if current_user.is_authenticated and rev.user_id == current_user.id %}
+                            <div class="review-actions">
+                                <a href="{{ url_for('content.edit_review',
+                                                    content_id=content.id,
+                                                    review_id=rev.id) }}"
+                                   class="btn btn-sm btn-outline-secondary">
+                                    Düzenle
+                                </a>
+
+                                <form method="post"
+                                      action="{{ url_for('content.delete_review',
+                                                         content_id=content.id,
+                                                         review_id=rev.id) }}"
+                                      style="display:inline"
+                                      onsubmit="return confirm('Yorumu silmek istediğinize emin misiniz?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        Sil
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
                     </div>
-                    <div>{{ rev.text }}</div>
+
+                    <div>
+                        {{ rev.text }}
+                    </div>
                 </div>
             {% endfor %}
         {% else %}

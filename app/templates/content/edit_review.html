@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>"{{ content.title }}" için yorumu düzenle</h3>
+
+  <form method="post">
+    <div class="mb-3">
+      <label for="review-text" class="form-label">Yorumunuz</label>
+      <textarea id="review-text"
+                name="text"
+                rows="6"
+                class="form-control">{{ review.text }}</textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a href="{{ url_for('content.detail', content_id=content.id) }}"
+       class="btn btn-secondary ms-2">
+      Vazgeç
+    </a>
+  </form>
+</div>
+{% endblock %}

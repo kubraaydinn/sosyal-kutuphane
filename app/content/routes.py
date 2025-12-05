@@ -224,3 +224,74 @@ def detail(content_id):
         user_lists=user_lists,
         meta=meta
     )
+
+
+
+# ---------------------------------------------------------------------------
+# YORUM DÜZENLE
+# ---------------------------------------------------------------------------
+@bp.route("/<int:content_id>/reviews/<int:review_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_review(content_id, review_id):
+    review = (
+        Review.query
+        .filter_by(id=review_id, content_id=content_id)
+        .first_or_404()
+    )
+
+    # Sadece kendi yorumunu düzenleyebilsin
+    if review.user_id != current_user.id:
+        flash("Sadece kendi yorumunuzu düzenleyebilirsiniz.", "warning")
+        return redirect(url_for("content.detail", content_id=content_id))
+
+    if request.method == "POST":
+        text = request.form.get("text", "").strip()
+
+        if not text:
+            flash("Yorum boş olamaz.", "danger")
+            return redirect(url_for("content.edit_review",
+                                    content_id=content_id,
+                                    review_id=review_id))
+
+        review.text = text
+        # updated_at, modelde onupdate ile zaten otomatik güncelleniyor:contentReference[oaicite:1]{index=1}
+        db.session.commit()
+        flash("Yorumunuz güncellendi.", "success")
+        return redirect(url_for("content.detail", content_id=content_id))
+
+    return render_template(
+        "content/edit_review.html",
+        content=review.content,
+        review=review,
+    )
+
+
+# ---------------------------------------------------------------------------
+# YORUM SİL
+# ---------------------------------------------------------------------------
+@bp.route("/<int:content_id>/reviews/<int:review_id>/delete", methods=["POST"])
+@login_required
+def delete_review(content_id, review_id):
+    review = (
+        Review.query
+        .filter_by(id=review_id, content_id=content_id)
+        .first_or_404()
+    )
+
+    # Sadece kendi yorumunu silebilsin
+    if review.user_id != current_user.id:
+        flash("Sadece kendi yorumunuzu silebilirsiniz.", "warning")
+        return redirect(url_for("content.detail", content_id=content_id))
+
+    # Bu yoruma bağlı aktivite kartını da silelim (activity_type = 'review')
+    Activity.query.filter_by(
+        user_id=review.user_id,
+        content_id=content_id,
+        activity_type="review",
+        ref_id=review.id,
+    ).delete(synchronize_session=False)
+
+    db.session.delete(review)
+    db.session.commit()
+    flash("Yorumunuz silindi.", "info")
+    return redirect(url_for("content.detail", content_id=content_id))
